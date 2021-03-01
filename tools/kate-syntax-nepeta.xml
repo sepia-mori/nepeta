@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language
+	name="Nepeta"
+	section="Markup"
+	extensions="*.nya"
+	version="2"
+	kateversion="5.54.0"
+	indenter="normal"
+>
+	<highlighting>
+		<list name="codecTypes">
+			<item>base64</item>
+			<item>text</item>
+		</list>
+		<contexts>
+			<context name="NestedNodeContext" attribute="Identifier" lineEndContext="#stay">
+				<Detect2Chars char="/" char1="/" context="LineComment" />
+				<Detect2Chars char="/" char1="*" context="MultilineComment" beginRegion="Comment" />
+				
+				<!-- Skip over irrelevant whitespace -->
+				<DetectSpaces context="#stay" /> 
+				
+				<!-- Handle nested nodes -->
+				<Detect2Chars char="#" char1="&quot;" context="NodeHeaderString" beginRegion="NestedNode" />
+				<RegExpr String="#[^\x00-\x1F \t\n\r{};\\&quot;]"
+					context="NodeHeaderIdentifier" beginRegion="NestedNode" /> 
+				
+				<!-- Any non-nested node -->
+				<DetectChar char="&quot;" context="NodeHeaderString" />
+				<RegExpr String="[^\x00-\x1F \t\n\r{};\\#]" context="NodeHeaderIdentifier" />
+				
+				<!-- End of current node -->
+				<DetectChar char="#" context="#stay" attribute="Node Identifier" endRegion="NestedNode" />
+				
+				<!-- Any other character is an error -->
+				<RegExpr String="." attribute="Error" />
+			</context>
+			
+			<!-- Node header -->
+			<context name="NodeHeaderIdentifier" attribute="Node Identifier" lineEndContext="#pop">
+				<DetectSpaces context="#pop!Data" />
+			</context>
+			<context name="NodeHeaderString" attribute="Node Identifier" lineEndContext="#pop">
+				<RegExpr String="\\." context="#stay" />
+				<DetectChar char="&quot;" context="#pop!Data" attribute="Node Identifier" /> 
+			</context>
+			
+			<!-- Data context -->
+			<context name="Data" attribute="Identifier" lineEndContext="#pop" >
+				<Detect2Chars char="/" char1="/" context="LineComment" />
+				<Detect2Chars char="/" char1="*" context="MultilineComment" beginRegion="Comment" />
+				
+				<!-- Identifiers -->
+				<RegExpr String="[^\x00-\x1F \t\n\r{};\\&quot;]" attribute="Identifier"  context="#stay" />
+				<!-- String -->
+				<DetectChar char="&quot;" context="String" />
+				<!-- Block -->
+				<DetectChar char="{" context="BlockHeader" attribute="Keyword" beginRegion="Block" />
+				
+				<LineContinue context="#stay" char="\" attribute="Keyword" />
+				<DetectChar char=";" context="#pop" attribute="Keyword" />
+			</context>
+			
+			<context name="String" attribute="String" lineEndContext="#pop!EternalError">
+				<RegExpr String="\\." context="#stay" />
+				<DetectChar char="&quot;" attribute="String" context="#pop" />
+			</context>
+			
+			<context name="BlockHeader" attribute="Block" lineEndContext="#popBlockBody">
+				<DetectSpaces context="#stay" />
+				<keyword String="codecTypes" attribute="Keyword" />
+				<RegExpr String="." attribute="Error" />
+			</context>
+			
+			<context name="BlockBody" attribute="Block" lineEndContext="#stay">
+				<RegExpr String="^\s*\}" context="#pop" attribute="Keyword" endRegion="Block" />
+			</context>
+			
+			<!-- Comments -->
+			<context name="LineComment" attribute="Comment" lineEndContext="#pop" />
+			<context name="MultilineComment" attribute="Comment" lineEndContext="#stay" >
+				<Detect2Chars char="*" char1="/" attribute="Comment" context="#pop" endRegion="Comment" />
+			</context>
+			
+			<!-- Error contexts -->
+			<context name="EternalError" attribute="Error" lineEndContext="#stay" />
+		</contexts>
+		<itemDatas>
+			<itemData name="Node Identifier"	defStyleNum="dsVariable" />
+			<itemData name="Keyword"			defStyleNum="dsKeyword" />
+			<itemData name="Identifier"			defStyleNum="dsNormal" />
+			<itemData name="Block"				defStyleNum="dsVerbatimString" />
+			<itemData name="String"				defStyleNum="dsString" />
+			<itemData name="Comment"			defStyleNum="dsComment" />
+			<itemData name="Error"				defStyleNum="dsError" />
+		</itemDatas>
+	</highlighting>
+
+	<general> 
+		<comments>
+			<comment name="singleLine" start="//" />
+			<comment name="multiLine" start="/*" end="*/" region="Comment" />
+		</comments>
+		<folding indentationsensitive="0" />
+		<keywords casesensitive="1" additionalDeliminator="'&quot;" />
+	</general>
+
+</language>

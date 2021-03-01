@@ -1,0 +1,23 @@
+PROJECT_NAME           = Nepeta
+PROJECT_NUMBER         = @CMAKE_PROJECT_VERSION@
+PROJECT_BRIEF          = 
+PROJECT_LOGO           = 
+
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
+EXCLUDE_SYMBOLS        = detail
+
+CASE_SENSE_NAMES       = NO
+
+INPUT                  = "src/" \
+                         "documentation/"
+OUTPUT_DIRECTORY       = @CMAKE_CURRENT_BINARY_DIR@/documentation
+
+FILE_PATTERNS          = *.cpp *.h *.md
+
+SOURCE_BROWSER         = YES
+
+INCLUDE_GRAPH          = NO
+INCLUDED_BY_GRAPH      = NO
+DIRECTORY_GRAPH        = NO
+GENERATE_LATEX         = NO
